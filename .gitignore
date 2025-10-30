@@ -1,0 +1,6 @@
+# dont commit the __pycache__ files
+*/__pycache__/
+*.pyc
+
+# dont commit the checkpoints, too large
+outputs/

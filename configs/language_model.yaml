@@ -1,0 +1,35 @@
+# Language Model Configuration (Future)
+# This will be used for phoneme-to-text decoding
+
+language_model:
+  # Model type: 'ngram', 'neural', or 'transformer'
+  model_type: ngram
+  
+  # N-gram configuration
+  ngram:
+    order: 5                    # 5-gram model
+    smoothing: kneser_ney       # Smoothing method
+    vocab_file: null            # Path to vocabulary file
+    lm_path: null               # Path to pretrained LM (e.g., .arpa file)
+  
+  # Neural LM configuration (alternative)
+  neural:
+    model_type: lstm            # 'lstm', 'transformer'
+    vocab_size: 50000
+    embedding_dim: 512
+    hidden_dim: 1024
+    num_layers: 3
+    dropout: 0.3
+  
+  # Training configuration
+  training:
+    corpus_path: null           # Path to text corpus
+    batch_size: 128
+    max_epochs: 50
+    learning_rate: 0.001
+    
+  # System
+  system:
+    output_dir: ./outputs/lm
+    gpu: 0
+

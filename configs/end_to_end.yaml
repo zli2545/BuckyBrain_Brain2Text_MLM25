@@ -1,0 +1,35 @@
+# End-to-End Pipeline Configuration
+# For neural activity → phoneme → text decoding
+
+pipeline:
+  # Neural decoder (neural activity → phoneme logits)
+  neural_decoder:
+    checkpoint: outputs/neural_decoder/best.pt
+    config: configs/neural_decoder.yaml
+    
+  # Language model (phoneme → text)
+  language_model:
+    type: ngram                              # 'ngram' or 'neural'
+    checkpoint: outputs/lm/5gram.arpa        # LM checkpoint
+    config: configs/language_model.yaml
+  
+  # Beam search decoding parameters
+  decoding:
+    beam_size: 100                           # Beam width
+    acoustic_scale: 0.325                    # Weight for acoustic scores
+    blank_penalty: 90                        # CTC blank penalty
+    alpha: 0.55                              # LM weight
+    nbest: 100                               # N-best hypotheses
+    
+  # Evaluation
+  evaluation:
+    metrics:
+      - wer                                  # Word Error Rate
+      - cer                                  # Character Error Rate
+      - per                                  # Phoneme Error Rate
+    
+  # System
+  system:
+    gpu: 0
+    batch_size: 1                            # For real-time inference
+
