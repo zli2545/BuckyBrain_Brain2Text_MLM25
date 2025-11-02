@@ -8,6 +8,7 @@ import time
 import math
 import logging
 import pathlib
+from contextlib import nullcontext
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -109,6 +110,19 @@ class Trainer:
         
         # Device configuration
         self.device = self._setup_device(gpu)
+        
+        # Auto-detect device type for AMP (CPU doesn't support bfloat16)
+        if self.device_type == "cpu":
+            # CPU: disable AMP completely (CPU autocast only supports bfloat16/float16, not float32)
+            if amp:
+                self.logger.warning("AMP with bfloat16 not supported on CPU. Using float32 instead.")
+                self.amp = False  # Disable AMP on CPU
+                self.amp_dtype = torch.float32
+            else:
+                self.amp_dtype = torch.float32
+        else:
+            # CUDA: use bfloat16
+            self.amp_dtype = torch.bfloat16 if amp else torch.float32
         
         # Set random seed
         if seed != -1:
@@ -257,9 +271,11 @@ class Trainer:
                 self.logger.warning(f"GPU {gpu} not available, using GPU 0")
                 gpu = 0
             device = torch.device(f"cuda:{gpu}")
+            self.device_type = "cuda"
             self.logger.info(f"Using device: {device} ({torch.cuda.get_device_name(gpu)})")
         else:
             device = torch.device("cpu")
+            self.device_type = "cpu"
             self.logger.info("Using device: CPU")
         
         return device
@@ -311,7 +327,7 @@ class Trainer:
             
             day_id = int(D[0].item())
             
-            with torch.autocast(device_type="cuda", enabled=self.amp, dtype=torch.bfloat16):
+            with torch.autocast(device_type=self.device_type, enabled=self.amp, dtype=self.amp_dtype):
                 # Apply augmentation (validation mode = smoothing only)
                 x, T = self.augment(x, T, mode='val', device=self.device)
                 
@@ -377,7 +393,7 @@ class Trainer:
         self.logger.info("Starting training")
         self.logger.info("="*80)
         
-        scaler_ctx = torch.autocast(device_type="cuda", enabled=self.amp, dtype=torch.bfloat16)
+        scaler_ctx = torch.autocast(device_type=self.device_type, enabled=self.amp, dtype=self.amp_dtype)
         self.model.train()
         
         t0 = time.time()

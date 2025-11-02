@@ -11,32 +11,11 @@ dataset:
     - t15.2023.08.13
     - t15.2023.08.18
     - t15.2023.08.20
-    - t15.2023.08.25
-    - t15.2023.08.27
-    - t15.2023.09.01
-    - t15.2023.09.03
-    - t15.2023.09.24
-    - t15.2023.09.29
-    - t15.2023.10.01
-    - t15.2023.10.06
-    - t15.2023.10.08
-    - t15.2023.10.13
-    - t15.2023.10.15
-    - t15.2023.10.20
-    - t15.2023.10.22
-    - t15.2023.11.03
-    - t15.2023.11.04
-    - t15.2023.11.17
-    - t15.2023.11.19
-    - t15.2023.11.26
 
 
   # sessions_val: null    # null = auto-discover
   sessions_val:
     - t15.2023.08.13
-    - t15.2023.09.03
-    - t15.2023.10.13
-    - t15.2023.11.17
 
   exclude_sessions: []  # Sessions to exclude from auto-discovery
   auto_discover: false   # Use auto-discovery even if sessions specified

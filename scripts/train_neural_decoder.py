@@ -43,6 +43,12 @@ def main():
         action="store_true",
         help="Quick debug mode (small batch count)"
     )
+    parser.add_argument(
+        "--debug_batches",
+        type=int,
+        default=None,
+        help="Number of batches for debug mode (overrides default 100)"
+    )
     
     args = parser.parse_args()
     
@@ -63,9 +69,10 @@ def main():
     
     # Debug mode: reduce batch count
     if args.debug:
-        print("DEBUG MODE: Using reduced batch count")
-        cfg.training.n_train_batches = 500
-        cfg.training.val_every = 100
+        debug_batches = args.debug_batches if args.debug_batches is not None else 100
+        print(f"DEBUG MODE: Using {debug_batches} batches for testing")
+        cfg.training.n_train_batches = debug_batches
+        cfg.training.val_every = max(10, debug_batches // 2)  # Validate halfway through
         if cfg.system.output_dir == "./outputs":
             cfg.system.output_dir = "./outputs_debug"
     
